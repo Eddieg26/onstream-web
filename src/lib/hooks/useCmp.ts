@@ -1,24 +1,24 @@
 import { map } from "radash";
 import { create } from "zustand";
 import {
-    AppContext,
-    CmpResponse,
-    ContainerLayout,
-    GameWidgetData,
-    MLBStats,
-    NBAStats,
-    NFLStats,
-    NHLStats,
-    Nullable,
-    PageLayout,
-    Property,
-    PropertyConfig,
-    RawGameStats,
-    RawStats,
-    SportLeague,
-    SportStats,
-    TileSize,
-    WeatherData,
+	AppContext,
+	CmpResponse,
+	ContainerLayout,
+	GameWidgetData,
+	MLBStats,
+	NBAStats,
+	NFLStats,
+	NHLStats,
+	Nullable,
+	PageLayout,
+	Property,
+	PropertyConfig,
+	RawGameStats,
+	RawStats,
+	SportLeague,
+	SportStats,
+	TileSize,
+	WeatherData,
 } from "../types";
 
 export type Cmp = {
@@ -166,16 +166,6 @@ export const useCmp = create<Cmp>((set, get) => ({
 
 export function selectProperty(state: Cmp) {
 	return state.property;
-}
-
-export function useTheme() {
-	const property = useCmp(selectProperty);
-
-	return (
-		property?.config?.theme ?? {
-			primary: "#f01446",
-		}
-	);
 }
 
 type PropertyResponse = Omit<Property, "config">;

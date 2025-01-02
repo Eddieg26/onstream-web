@@ -1,4 +1,4 @@
-import { styled } from "@stitches/react";
+import { styled } from "@/lib/theme";
 
 export const AppContainer = styled("div", {
 	display: "flex",

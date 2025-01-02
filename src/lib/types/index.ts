@@ -205,3 +205,8 @@ export interface UserSession {
 	user: User;
 	session: CognitoUserSession;
 }
+
+export enum TemperatureFormat {
+	Celsius = "°C",
+	Fahrenheit = "°F",
+}

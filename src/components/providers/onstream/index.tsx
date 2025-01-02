@@ -1,12 +1,13 @@
 "use client";
-import { Navbar } from "@/components/nav/Navbar";
-import { Center, Spinner, Switch } from "@/components/utility";
+import { Navbar } from "@/components/nav";
+import { Center, Match, Spinner, Switch } from "@/components/utility";
 import { Api } from "@/lib/api";
-import { useCmp, useEpg, useTheme } from "@/lib/hooks";
+import { useCmp, useEpg } from "@/lib/hooks";
 import { OnstreamContext } from "@/lib/hooks/useOnstream";
 import { AppState, Config } from "@/lib/types";
 import React, { useRef } from "react";
 import useSWR from "swr";
+import { ThemeProvider } from "../theme";
 import { AppContainer } from "./styles";
 
 type Props = {
@@ -24,7 +25,12 @@ export default function Onstream({ children, config }: Props) {
 	});
 
 	const { property, getProperty } = useCmp();
-	const theme = useTheme();
+
+	const theme = {
+		colors: {
+			primary: property?.config?.theme.primary ?? "#000",
+		},
+	};
 
 	const getSmartboxId = useEpg((state) => state.getSmartboxId);
 
@@ -39,17 +45,25 @@ export default function Onstream({ children, config }: Props) {
 		() => getProperty(context, smartboxIdReq.data ?? "")
 	);
 
+	const isLoading = smartboxIdReq.isLoading || propertyReq.isLoading;
+
 	return (
 		<OnstreamContext.Provider value={{ context, property }}>
-			<Switch value={smartboxIdReq.isLoading || propertyReq.isLoading}>
-				<Center style={{ width: "100vw", height: "100vh" }}>
-					<Spinner size="lg" color={theme.primary} />
-				</Center>
-				<AppContainer type={type}>
-					<Navbar sideNav={type === "MDU"} />
-					{children}
-				</AppContainer>
-			</Switch>
+			<ThemeProvider theme={theme}>
+				<Switch>
+					<Match when={isLoading}>
+						<Center style={{ width: "100vw", height: "100vh" }}>
+							<Spinner size="lg" color={theme.colors.primary} />
+						</Center>
+					</Match>
+					<Match when={!isLoading}>
+						<AppContainer type={type}>
+							<Navbar sideNav={type === "MDU"} />
+							{children}
+						</AppContainer>
+					</Match>
+				</Switch>
+			</ThemeProvider>
 		</OnstreamContext.Provider>
 	);
 }

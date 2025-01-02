@@ -1,5 +1,6 @@
 export { Center } from "./Center";
 export { RenderList } from "./RenderList";
+export { Show } from "./Show";
 export { Spinner } from "./Spinner";
-export { Switch } from "./Switch";
+export { Match, Switch } from "./Switch";
 

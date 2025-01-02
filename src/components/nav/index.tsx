@@ -4,8 +4,9 @@ import { isNull } from "@/lib/utils";
 import { fork, select } from "radash";
 import React from "react";
 import { useShallow } from "zustand/react/shallow";
-import { Icon, IconType } from "../elements/Icon";
-import { RenderList, Switch } from "../utility";
+import { IconType } from "../elements/Icon";
+import { Match, RenderList, Switch } from "../utility";
+import { Styles } from "./styles";
 
 type Props = {
 	sideNav: boolean;
@@ -15,23 +16,25 @@ export function Navbar({ sideNav }: Props) {
 	const navItems = usePageFilter(useShallow(selectNavPages));
 
 	return (
-		<Switch value={sideNav}>
-			<SideNavbar items={navItems} />
-			<TopNavbar items={navItems} />
+		<Switch>
+			<Match when={sideNav}>
+				<SideNavbar items={navItems} />
+			</Match>
+			<Match when={!sideNav}>
+				<TopNavbar items={navItems} />
+			</Match>
 		</Switch>
 	);
 }
 
 function TopNavbar({ items }: { items: PageConfig[] }) {
-	const [pinned, grouped] = fork(items, (item) => item.pinned == true);
+	const [start, end] = fork(items, (item) => !item.pinned);
 	return (
-		<nav className="flex flex-row items-center px-8 h-28 navbar">
-			<div className="flex flex-row items-center flex-grow">
-				<div className="mr-8 w-fit max-w-96">
-					<img src="/onstream.png" />
-				</div>
+		<Styles.TopNav>
+			<Styles.NavItems variant="start">
+				<img src="/onstream.png" />
 				<RenderList
-					items={grouped}
+					items={start}
 					render={(item) => (
 						<NavItem
 							title={item.title}
@@ -42,10 +45,10 @@ function TopNavbar({ items }: { items: PageConfig[] }) {
 					)}
 					keyExtractor={(item) => item.title}
 				/>
-			</div>
-			<div className="flex flex-row items-center">
+			</Styles.NavItems>
+			<Styles.NavItems variant="end">
 				<RenderList
-					items={pinned}
+					items={end}
 					render={(item) => (
 						<NavItem
 							title={item.title}
@@ -56,30 +59,26 @@ function TopNavbar({ items }: { items: PageConfig[] }) {
 					)}
 					keyExtractor={(item) => item.title}
 				/>
-			</div>
-		</nav>
+			</Styles.NavItems>
+		</Styles.TopNav>
 	);
 }
 
 function SideNavbar({ items }: { items: PageConfig[] }) {
-	const [pinned, grouped] = fork(items, (item) => item.pinned == true);
+	const [start, end] = fork(items, (item) => !item.pinned);
 	const [expanded, setExpanded] = React.useState(false);
 
 	return (
-		<nav className={`${expanded ? "w-screen" : ""}`}>
+		<Styles.SideNav>
 			<div
-				className={`navbar flex flex-col items-center h-full ${
-					expanded ? "w-40" : "w-20"
-				}`}
+				id="container"
 				onMouseEnter={() => setExpanded(true)}
 				onMouseLeave={() => setExpanded(false)}
 			>
-				<div className="flex flex-col items-center">
-					<div className="ml-4 mr-8">
-						<img src="/assets/onstream.png" />
-					</div>
+				<Styles.NavItems variant="start">
+					<img src="/assets/onstream.png" />
 					<RenderList
-						items={grouped}
+						items={start}
 						render={(item) => (
 							<NavItem
 								title={item.title}
@@ -91,10 +90,10 @@ function SideNavbar({ items }: { items: PageConfig[] }) {
 						)}
 						keyExtractor={(item) => item.title}
 					/>
-				</div>
-				<div className="flex flex-col items-center">
+				</Styles.NavItems>
+				<Styles.NavItems variant="end">
 					<RenderList
-						items={pinned}
+						items={end}
 						render={(item) => (
 							<NavItem
 								title={item.title}
@@ -106,9 +105,9 @@ function SideNavbar({ items }: { items: PageConfig[] }) {
 						)}
 						keyExtractor={(item) => item.title}
 					/>
-				</div>
+				</Styles.NavItems>
 			</div>
-		</nav>
+		</Styles.SideNav>
 	);
 }
 
@@ -124,16 +123,18 @@ function NavItem({ title, icon, href, compact, sideNav }: NavItemProps) {
 	const theme = useTheme();
 
 	return (
-		<a
+		<Styles.NavLink
 			href={href}
-			style={{ color: theme.primary }}
-			className={`btn btn-link justify-center items-center flex no-underline ${
-				sideNav ? "flex-row w-full" : "flex-col h-full"
-			}`}
+			style={{ color: theme.colors.primary }}
+			sideNav={sideNav}
 		>
-			<Icon icon={icon} className="w-8 h-8" style={{ color: "white" }} />
+			<Styles.NavIcon
+				icon={icon}
+				className="w-8 h-8"
+				style={{ color: theme.colors.primary }}
+			/>
 			{!compact && <span>{title}</span>}
-		</a>
+		</Styles.NavLink>
 	);
 }
 

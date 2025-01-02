@@ -5,4 +5,5 @@ export * from "./useDvr";
 export * from "./useEpg";
 export * from "./useOnstream";
 export * from "./usePages";
+export * from "./useTheme";
 

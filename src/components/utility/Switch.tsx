@@ -1,13 +1,40 @@
-import React from "react";
+import { Nullable } from "@/lib/types";
+import { uid } from "radash";
+import React, { useEffect } from "react";
+
+const SwitchContext = React.createContext({
+	value: { current: "" as Nullable<string> },
+});
 
 type Props = {
-    value: boolean;
-    children: React.ReactNode | React.ReactNode[];
+	children: React.ReactNode;
+	fallback?: React.ReactNode;
 };
-export function Switch({ value, children }: Props) {
-    const array = React.Children.toArray(children);
-    const left = array.length > 0 ? array[0] : null;
-    const right = array.length > 1 ? array[1] : null;
+export function Switch({ children, fallback }: Props) {
+	const value = React.useRef<Nullable<string>>(null);
 
-    return value ? left : right;
+	return (
+		<SwitchContext.Provider value={{ value }}>
+			{value ? children : fallback || null}
+		</SwitchContext.Provider>
+	);
+}
+
+export function Match({
+	when,
+	children,
+}: {
+	when: boolean;
+	children: React.ReactNode;
+}) {
+	const context = React.useContext(SwitchContext);
+	const id = React.useRef(uid(10));
+
+	useEffect(() => {
+		if (when && !context.value.current) {
+			context.value.current = id.current;
+		}
+	}, [context, when]);
+
+	return context.value.current === id.current ? <>{children}</> : null;
 }
